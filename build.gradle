@@ -25,6 +25,13 @@ allprojects {
         maven { url 'https://repo.spring.io/libs-milestone' }
         maven { url 'https://repo.spring.io/snapshot' }
     }
+
+    jar {
+        enabled = true
+    }
+    bootJar {
+        enabled = false
+    }
 }
 
 // include로 포함되어있는 모든 모듈에서 사용하는 것들 명시
@@ -47,13 +54,6 @@ subprojects {
 //        runtime('mysql:mysql-connector-java')
         runtime('com.h2database:h2')
         annotationProcessor ('org.projectlombok:lombok:1.18.12')
-    }
-
-    jar {
-        enabled = true
-    }
-    bootJar {
-        enabled = false
     }
 
     clean {
