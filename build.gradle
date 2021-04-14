@@ -25,13 +25,6 @@ allprojects {
         maven { url 'https://repo.spring.io/libs-milestone' }
         maven { url 'https://repo.spring.io/snapshot' }
     }
-
-    jar {
-        enabled = true
-    }
-    bootJar {
-        enabled = false
-    }
 }
 
 // include로 포함되어있는 모든 모듈에서 사용하는 것들 명시
