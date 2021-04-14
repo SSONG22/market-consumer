@@ -49,6 +49,13 @@ subprojects {
         annotationProcessor ('org.projectlombok:lombok:1.18.12')
     }
 
+    jar {
+        enabled = true
+    }
+    bootJar {
+        enabled = false
+    }
+
     clean {
         delete 'out'
     }
