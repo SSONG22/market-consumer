@@ -1,8 +1,8 @@
 package com.pmc.market.config;
 
+import com.pmc.market.entity.Role;
 import com.pmc.market.oauth2.*;
-import com.pmc.market.oauth2.util.RestAuthenticationEntryPoint;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,33 +15,27 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+@RequiredArgsConstructor
 @Configuration
-@EnableWebSecurity
-@EnableGlobalMethodSecurity(
-        securedEnabled = true,
+@EnableWebSecurity // Spring security  활설화
+@EnableGlobalMethodSecurity( // Security Method  활성화
+        securedEnabled = true, // 인가 처리 옵션
         jsr250Enabled = true,
-        prePostEnabled = true
+        prePostEnabled = true // @Pre,PostAuthorize 처리 옵션
 )
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
 
-    @Autowired
-    private CustomOAuth2UserService customOAuth2UserService;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
-    @Autowired
-    private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
-    @Autowired
-    private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
-    @Autowired
-    private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter() {
@@ -49,15 +43,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     /*
-      By default, Spring OAuth2 uses HttpSessionOAuth2AuthorizationRequestRepository to save
-      the authorization request. But, since our service is stateless, we can't save it in
-      the session. We'll save the request in a Base64 encoded cookie instead.
+        JWT를 사용하기 때문에 Sesseion에 저장할 필요가 없어져
+        Authorization Request 를 Base64 encoded cookie에 저장
     */
     @Bean
     public HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository() {
         return new HttpCookieOAuth2AuthorizationRequestRepository();
     }
 
+    // Authorization 에 사용할 userDetailService 와 Password Encoder 정의
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder
@@ -65,12 +59,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .passwordEncoder(passwordEncoder());
     }
 
+    // SecurityConfig 에서 사용할 password encoder 를 BCryptPasswordEncoder 로 정의
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-
+    // AuthenticationManager 를 외부에서 사용하기 위해 AuthenticationManager Bean을 통해
+    // @Autowired 가 아닌 @Bean 설정으로 Spring Security 밖으로 Authentication 추출
     @Bean(BeanIds.AUTHENTICATION_MANAGER)
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -80,52 +76,40 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                // CORS 허용
                 .cors()
                 .and()
+                // 토큰을 사용하기 위해 sessionCreationPolicy 를 STATELESS 로 설정 (Session 비 활성화)
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .csrf()
-                .disable()
-                .formLogin()
-                .disable()
-                .httpBasic()
-                .disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(new RestAuthenticationEntryPoint())
-                .and()
+                // CSRF 비활성화
+                .csrf().disable()
+                // 로그인폼 비활성화
+                .formLogin().disable()
+                // 기본 로그인 창 비활성화
+                .httpBasic().disable()
                 .authorizeRequests()
-                .antMatchers("/",
-                        "/error",
-                        "/favicon.ico",
-                        "/**/*.png",
-                        "/**/*.gif",
-                        "/**/*.svg",
-                        "/**/*.jpg",
-                        "/**/*.html",
-                        "/**/*.css",
-                        "/**/*.js")
-                .permitAll()
-                .antMatchers("/auth/**", "/oauth2/**")
-                .permitAll()
-                .anyRequest()
-                .authenticated()
+                .antMatchers("/").permitAll()
+                .antMatchers("/api/**").hasAnyRole(Role.GUEST.name(), Role.BUYER.name())
+                .antMatchers("/auth/**", "/oauth2/**").permitAll()
+                .anyRequest().authenticated()
                 .and()
-                .oauth2Login()
-                .authorizationEndpoint()
+                .oauth2Login().authorizationEndpoint()
+                // 클라이언트 처음 로그인 시도 URI
                 .baseUri("/oauth2/authorize")
                 .authorizationRequestRepository(cookieAuthorizationRequestRepository())
                 .and()
-                .redirectionEndpoint()
-                .baseUri("/oauth2/callback/*")
-                .and()
+//                .redirectionEndpoint()
+//                .baseUri("/oauth2/callback/*")
+//                .and()
                 .userInfoEndpoint()
                 .userService(customOAuth2UserService)
                 .and()
                 .successHandler(oAuth2AuthenticationSuccessHandler)
                 .failureHandler(oAuth2AuthenticationFailureHandler);
 
-        // Add our custom Token based authentication filter
+        // UsernamePasswordAuthenticationFilter 앞에 custom 필터 추가
         http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 }

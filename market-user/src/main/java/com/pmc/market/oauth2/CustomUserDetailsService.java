@@ -2,7 +2,6 @@ package com.pmc.market.oauth2;
 
 import com.pmc.market.entity.User;
 import com.pmc.market.error.exception.EntityNotFoundException;
-import com.pmc.market.oauth2.util.UserPrincipal;
 import com.pmc.market.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

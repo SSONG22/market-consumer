@@ -1,6 +1,7 @@
-package com.pmc.market.oauth2.util;
+package com.pmc.market.oauth2;
 
 import com.pmc.market.entity.User;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,7 +11,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+/** User 를 생성자로 전달받아 Spring Security 에 User 정보를 전달한다.
+ *  UserPrincipal 클래스는 인증 된 Spring Security 주체를 나타낸다.
+ *  인증된 사용자의 세부 정보를 포함한다.
+ * */
 
+@Getter
 public class UserPrincipal implements OAuth2User, UserDetails {
     private Long id;
     private String email;

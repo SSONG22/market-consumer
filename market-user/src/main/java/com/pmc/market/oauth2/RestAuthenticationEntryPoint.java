@@ -1,4 +1,4 @@
-package com.pmc.market.oauth2.util;
+package com.pmc.market.oauth2;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

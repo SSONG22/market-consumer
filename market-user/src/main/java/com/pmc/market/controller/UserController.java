@@ -3,7 +3,7 @@ package com.pmc.market.controller;
 import com.pmc.market.entity.User;
 import com.pmc.market.entity.UserCreateRequestDto;
 import com.pmc.market.oauth2.CurrentUser;
-import com.pmc.market.oauth2.util.UserPrincipal;
+import com.pmc.market.oauth2.UserPrincipal;
 import com.pmc.market.repository.UserRepository;
 import com.pmc.market.service.UserService;
 import io.swagger.annotations.Api;

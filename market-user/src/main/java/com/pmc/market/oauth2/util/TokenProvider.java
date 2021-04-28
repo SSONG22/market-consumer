@@ -1,6 +1,7 @@
 package com.pmc.market.oauth2.util;
 
 import com.pmc.market.config.AppProperties;
+import com.pmc.market.oauth2.UserPrincipal;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

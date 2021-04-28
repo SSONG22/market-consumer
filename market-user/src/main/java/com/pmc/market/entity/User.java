@@ -6,13 +6,12 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "email")})
 @Entity
-@Builder
 public class User {
 
     @Id
@@ -55,12 +54,14 @@ public class User {
     @Column
     private String authKey;
 
-    public User(String name, String email, Role role, Status status, String picture) {
+    @Builder
+    public User(String name, String email, Role role, Status status, String picture, AuthProvider authProvider) {
         this.name = name;
         this.email = email;
         this.role = role;
         this.status = status;
         this.picture = picture;
+        this.provider = authProvider;
     }
 
     public User update(String name, String picture) {
@@ -72,5 +73,4 @@ public class User {
     public String getRoleKey() {
         return this.role.getKey();
     }
-
 }
