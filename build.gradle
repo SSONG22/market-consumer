@@ -25,6 +25,19 @@ allprojects {
         maven { url 'https://repo.spring.io/libs-milestone' }
         maven { url 'https://repo.spring.io/snapshot' }
     }
+
+    task initSourceFolders {
+        sourceSets*.java.srcDirs*.each {
+            if (!it.exists()) {
+                it.mkdirs()
+            }
+        }
+        sourceSets *. resources.srcDirs*.each {
+            if (!it.exists()) {
+                it.mkdirs()
+            }
+        }
+    }
 }
 
 // include로 포함되어있는 모든 모듈에서 사용하는 것들 명시
@@ -50,6 +63,14 @@ subprojects {
 
     clean {
         delete 'out'
+    }
+
+    jar {
+        enabled = true
+    }
+
+    bootJar {
+        enabled = false
     }
 }
 
