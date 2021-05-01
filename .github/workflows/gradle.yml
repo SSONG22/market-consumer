@@ -24,4 +24,6 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew bootJar -p ./market-shop
+      run: ./gradlew bootJar -p ./market-shop && ./gradlew bootJar -p ./market-user && ./gradlew bootJar -p ./market-common
+          && ./gradlew bootJar -p ./market-order && ./gradlew bootJar -p ./market-product && && ./gradlew bootJar -p ./market-search
+      
